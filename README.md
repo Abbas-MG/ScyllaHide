@@ -4,11 +4,11 @@ This text is an effort to integrate ScyllaHide, an advanced anti-anti-debugging 
 ScyllaHideCE emerges as particularly beneficial when utilizing the Windows debugger integrated within Cheat Engine.
 
 Usage Instructions:
--Incorporate the plugin into Cheat Engine’s settings.
--Navigate to the “Memory View” window and proceed to the “Plugins” tab.
--Adjust the “ScyllaHideCE mode” setting to “Attach” if you intend to attach it to an already running process, or to “Open” if you aim to commence the debugging of a new process.
--To initiate a process within Cheat Engine, firstly ensure the Windows debugger is selected within the settings.
--Subsequently, click on the “Open Process” button, choose “File”, and then select “Create Process”.
+- Incorporate the plugin into Cheat Engine’s settings.
+- Navigate to the “Memory View” window and proceed to the “Plugins” tab.
+- Adjust the “ScyllaHideCE mode” setting to “Attach” if you intend to attach it to an already running process, or to “Open” if you aim to commence the debugging of a new process.
+- To initiate a process within Cheat Engine, firstly ensure the Windows debugger is selected within the settings.
+- Subsequently, click on the “Open Process” button, choose “File”, and then select “Create Process”.
 
 
 
