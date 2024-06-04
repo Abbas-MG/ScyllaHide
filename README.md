@@ -1,5 +1,5 @@
 # ScyllaHideCE
-This text is an effort to integrate ScyllaHide, an advanced anti-anti-debugging and anti-reverse engineering tool, into Cheat Engine, a popular memory scanning and debugging software. While Cheat Engine offers robust features for stealthy debugging, it encounters difficulties when initiating the debugging of a process right from its entry point, particularly if the target game employs protection mechanisms. For instance, should one wish to investigate the unpacking routine of an obscure file format within a safeguarded game, Cheat Engine alone would not suffice for such a task with ease.
+This is an effort to integrate ScyllaHide, an advanced anti-anti-debugging and anti-reverse engineering tool, into Cheat Engine, a popular memory scanning and debugging software. While Cheat Engine offers robust features for stealthy debugging, it encounters difficulties when initiating the debugging of a process right from its entry point, particularly if the target game employs protection mechanisms. For instance, should one wish to investigate the unpacking routine of an obscure file format within a safeguarded game, Cheat Engine alone would not suffice for such a task with ease.
 
 ScyllaHideCE emerges as particularly beneficial when utilizing the Windows debugger integrated within Cheat Engine.
 
