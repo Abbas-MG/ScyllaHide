@@ -249,7 +249,7 @@ BOOL __stdcall MemViewPlug_attOrOpn(UINT_PTR* disassembleraddress, UINT_PTR* sel
     memorybrowserpluginid = Exported.RegisterFunction(selfID, ptMemoryView, &MEMVIEWPLUG_attOrStrt);
     if (memorybrowserpluginid == -1)
     {
-        showError(false, "Failure to register the ondebugevent plugin");
+        showError("Failure to register the ondebugevent plugin", false);
         return FALSE;
     }
     return TRUE;
@@ -264,14 +264,15 @@ BOOL __stdcall disassemblercontextPopup(UINT_PTR selectedAddress, char** address
 BOOL __stdcall disassemblercontext(UINT_PTR* selectedAddress)
 {
     ProcessId = (DWORD) * (Exported.OpenedProcessID);
-    if (ProcessId) {
+
+    if (isProcAlive(ProcessId)) {
         ZeroMemory(&g_hdd, sizeof(HOOK_DLL_DATA));
         ReadNtApiInformation(&g_hdd);
         DialogBox(hinst, MAKEINTRESOURCE(IDD_OPTIONS), NULL, &OptionsDlgProc);
         return TRUE;
     }
     else {
-        showError(false, "No process is selected");
+        showError("No process is selected", false);
         return FALSE;
     }
 }
@@ -279,7 +280,8 @@ BOOL __stdcall disassemblercontext(UINT_PTR* selectedAddress)
 BOOL __stdcall MemViewPlug_opt(UINT_PTR* disassembleraddress, UINT_PTR* selected_disassembler_address, UINT_PTR* hexviewaddress)
 {
     ProcessId = (DWORD) * (Exported.OpenedProcessID);
-    if (ProcessId) {
+
+    if (isProcAlive(ProcessId)) {
         ZeroMemory(&g_hdd, sizeof(HOOK_DLL_DATA));
         ReadNtApiInformation(&g_hdd);
         DialogBox(hinst, MAKEINTRESOURCE(IDD_OPTIONS), NULL, &OptionsDlgProc);
@@ -294,14 +296,15 @@ BOOL __stdcall MemViewPlug_opt(UINT_PTR* disassembleraddress, UINT_PTR* selected
 BOOL __stdcall MemViewPlug_InjDll(UINT_PTR* disassembleraddress, UINT_PTR* selected_disassembler_address, UINT_PTR* hexviewaddress)
 {
     ProcessId = (DWORD) * (Exported.OpenedProcessID);
-    if (ProcessId) {
+
+    if (isProcAlive(ProcessId)) {
         wchar_t dllPath[MAX_PATH] = {};
         if (scl::GetFileDialogW(dllPath, _countof(dllPath))) {
             injectDll(ProcessId, dllPath);
             return TRUE;
         }
         else {
-            showError(true, "Error on DLL opening the dll file");
+            showError("Error on DLL opening the dll file");
             return FALSE;
         }
             
@@ -349,7 +352,7 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
                 {
                     if (!ApplyAntiAntiAttach(ProcessId))
                     {
-                        showError(true, "Anti-Anti-Attach failed");
+                        showError("Anti-Anti-Attach failed");
                     }
                 }
                 if (!bHooked)
@@ -377,7 +380,7 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
                 {
                     if (!ApplyAntiAntiAttach(ProcessId))
                     {
-                        showError(true, "Anti-Anti-Attach failed");
+                        showError("Anti-Anti-Attach failed");
                     }
                 }
                 if (!bHooked)
