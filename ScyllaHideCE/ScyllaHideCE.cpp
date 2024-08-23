@@ -68,6 +68,26 @@ bool isProcAlive(DWORD procID)
     return isAlive;
 }
 
+bool fixPeb(LPDEBUG_EVENT DebugEvent)
+{
+    bool result = false;
+
+    if (g_settings.opts().fixPebHeapFlags)
+    {
+        if (specialPebFix)
+        {
+            result = StartFixBeingDebugged(ProcessId, false);
+            specialPebFix = false;
+        }
+
+        if (DebugEvent->u.LoadDll.lpBaseOfDll == hNtdllModule)
+        {
+            result = StartFixBeingDebugged(ProcessId, true);
+            specialPebFix = true;
+        }
+    }
+    return result;
+}
 
 int AdjustGUISize(int baseSize, float scalingFactor) {
     return static_cast<int>(baseSize * scalingFactor);
