@@ -362,6 +362,7 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
                     bHooked = true;
                 }
             }
+            fixPeb(DebugEvent);
         }
         break;
     }
@@ -398,25 +399,61 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
     {
         if (bHooked)
         {
-            startInjection(ProcessId, &g_hdd, g_scyllaHideDllPath.c_str(), false);
+            BYTE* dllMemory = ReadFileToMemory(g_scyllaHideDllPath.c_str());
+            if (dllMemory)
+            {
+                startInjectionProcessNoSuspend(handle, &g_hdd, dllMemory, false);
+                free(dllMemory);
+            }
+            else
+            {
+                g_log.LogError(L"Cannot find %s", g_scyllaHideDllPath.c_str());
+                MessageBoxW(nullptr, L"Failed to load ScyllaHide hook library DLL! Make sure it is installed correctly and has not been deleted by an anti-virus.", L"Error", MB_ICONERROR);
+            }
+
+            fixPeb(DebugEvent);
         }
         break;
     }
     case EXCEPTION_DEBUG_EVENT:
     {
-        //hoping to get the 0x80000003 that windows debugger sends
+        // hoping to get the 0x80000003 that windows debugger sends
+        // this means debugger is done attaching
         switch (DebugEvent->u.Exception.ExceptionRecord.ExceptionCode)
         {
         case STATUS_BREAKPOINT:
         {
+            if (g_settings.opts().killAntiAttach)
+            {
+                if (!ApplyAntiAntiAttach(ProcessId))
+                {
+                    showError("Anti-Anti-Attach failed");
+                }
+            }
+
             //aat error
             if (!bHooked)
             {
+                ZeroMemory(&g_hdd, sizeof(HOOK_DLL_DATA));
                 ReadNtApiInformation(&g_hdd);
 
+                //startInjection(ProcessId, &g_hdd, g_scyllaHideDllPath.c_str(), true);
+
+                BYTE* dllMemory = ReadFileToMemory(g_scyllaHideDllPath.c_str());
+                if (dllMemory)
+                {
+                    startInjectionProcessNoSuspend(handle, &g_hdd, dllMemory, true);
+                    free(dllMemory);
+                }
+                else
+                {
+                    g_log.LogError(L"Cannot find %s", g_scyllaHideDllPath.c_str());
+                    MessageBoxW(nullptr, L"Failed to load ScyllaHide hook library DLL! Make sure it is installed correctly and has not been deleted by an anti-virus.", L"Error", MB_ICONERROR);
+                }
+
                 bHooked = true;
-                startInjection(ProcessId, &g_hdd, g_scyllaHideDllPath.c_str(), true);
             }
+            fixPeb(DebugEvent);
             break;
         }
         }
