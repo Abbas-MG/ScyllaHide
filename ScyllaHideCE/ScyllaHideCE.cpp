@@ -24,7 +24,10 @@ HINSTANCE hinst;
 HMODULE hNtdllModule = 0;
 bool specialPebFix = false;
 DWORD ProcessId = 0;
+DWORD ProcessId = 0;
+DWORD LastProcessId = 0;
 bool bHooked = false;
+
 //link time
 HWND hwndDlg;
 
@@ -321,20 +324,17 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
     HANDLE handle = *(Exported.OpenedProcessHandle);
     ProcessId = (DWORD) * (Exported.OpenedProcessID);
 
-    if (g_settings.opts().fixPebHeapFlags)
+    if (!LastProcessId)
     {
-        if (specialPebFix)
-        {
-            StartFixBeingDebugged(ProcessId, false);
-            specialPebFix = false;
-        }
-
-        if (DebugEvent->u.LoadDll.lpBaseOfDll == hNtdllModule)
-        {
-            StartFixBeingDebugged(ProcessId, true);
-            specialPebFix = true;
-        }
+        LastProcessId = ProcessId;
     }
+    else if (LastProcessId != ProcessId)
+    {
+        bHooked = false;
+        LastProcessId = ProcessId;
+    }
+
+    fixPeb(DebugEvent);
 
     switch (DebugEvent->dwDebugEventCode)
     {
@@ -343,7 +343,6 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
         //will freeze the windows debugger as it will wait for peb->BeingDebugged to become true (when attaching) and we are setting it to false
         if (dbgMode == Open) {
             ProcessId = DebugEvent->dwProcessId;
-            bHooked = false;
             ZeroMemory(&g_hdd, sizeof(HOOK_DLL_DATA));
 
             if (DebugEvent->u.CreateProcessInfo.lpStartAddress == NULL)
@@ -359,8 +358,8 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
                 {
                     ReadNtApiInformation(&g_hdd);
 
-                    bHooked = true;
                     startInjection(ProcessId, &g_hdd, g_scyllaHideDllPath.c_str(), true);
+                    bHooked = true;
                 }
             }
         }
@@ -442,6 +441,7 @@ BOOL __stdcall CEPlugin_GetVersion(PPluginVersion pv, int sizeofpluginversion)
 
 BOOL __stdcall CEPlugin_InitializePlugin(PExportedFunctions ef, int pluginid)
 {
+    bHooked = false;
     selfID = pluginid;
     Exported = *ef; 
     if (Exported.sizeofExportedFunctions != sizeof(Exported)) {
