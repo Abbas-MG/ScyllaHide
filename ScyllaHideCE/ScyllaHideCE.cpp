@@ -24,7 +24,6 @@ HINSTANCE hinst;
 HMODULE hNtdllModule = 0;
 bool specialPebFix = false;
 DWORD ProcessId = 0;
-DWORD ProcessId = 0;
 DWORD LastProcessId = 0;
 bool bHooked = false;
 
