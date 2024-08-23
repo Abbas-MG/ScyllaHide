@@ -32,6 +32,7 @@ int screenWidth;
 int screenHeight;
 float scalingFactor;
 
+static LPVOID remoteImageBase = 0;
 
 
 #ifdef _WIN64
@@ -87,6 +88,68 @@ bool fixPeb(LPDEBUG_EVENT DebugEvent)
         }
     }
     return result;
+}
+
+// forward declare for startInjectionProcessNoSuspend
+bool StartHooking(HANDLE hProcess, HOOK_DLL_DATA* hdd, BYTE* dllMemory, DWORD_PTR imageBase);
+void RestoreHooks(HOOK_DLL_DATA* hdd, HANDLE hProcess);
+
+// SyllaHide's startInjectionProcess suspends all threads and then resumes them;
+// This is incompatible when we are at EXIT_THREAD_DEBUG_EVENT and EXCEPTION_DEBUG_EVENT. so heres the modified version
+void startInjectionProcessNoSuspend(HANDLE hProcess, HOOK_DLL_DATA* hdd, BYTE* dllMemory, bool newProcess)
+{
+    const bool injectDll = g_settings.hook_dll_needed() || hdd->isNtdllHooked || hdd->isKernel32Hooked || hdd->isUserDllHooked;
+    DWORD hookDllDataAddressRva = GetDllFunctionAddressRVA(dllMemory, "HookDllData");
+
+    if (!newProcess)
+    {
+        //g_log.Log(L"Apply hooks again");
+        if (injectDll && StartHooking(hProcess, hdd, dllMemory, (DWORD_PTR)remoteImageBase))
+        {
+            WriteProcessMemory(hProcess, (LPVOID)((DWORD_PTR)hookDllDataAddressRva + (DWORD_PTR)remoteImageBase), hdd, sizeof(HOOK_DLL_DATA), 0);
+        }
+        else if (!injectDll)
+        {
+            StartHooking(hProcess, hdd, nullptr, 0);
+        }
+    }
+    else
+    {
+        if (g_settings.opts().removeDebugPrivileges)
+        {
+            RemoveDebugPrivileges(hProcess);
+        }
+
+        RestoreHooks(hdd, hProcess);
+
+        if (injectDll)
+        {
+            remoteImageBase = MapModuleToProcess(hProcess, dllMemory, true);
+            if (remoteImageBase)
+            {
+                FillHookDllData(hProcess, hdd);
+
+                if (StartHooking(hProcess, hdd, dllMemory, (DWORD_PTR)remoteImageBase) &&
+                    WriteProcessMemory(hProcess, (LPVOID)((DWORD_PTR)hookDllDataAddressRva + (DWORD_PTR)remoteImageBase), hdd, sizeof(HOOK_DLL_DATA), 0))
+                {
+                    g_log.LogInfo(L"Hook injection successful, image base %p", remoteImageBase);
+                }
+                else
+                {
+                    g_log.LogError(L"Failed to write hook dll data");
+                }
+            }
+            else
+            {
+                g_log.LogError(L"Failed to map image!");
+            }
+        }
+        else
+        {
+            if (StartHooking(hProcess, hdd, nullptr, 0))
+                g_log.LogInfo(L"PEB patch successful, hook injection not needed\n");
+        }
+    }
 }
 
 int AdjustGUISize(int baseSize, float scalingFactor) {
