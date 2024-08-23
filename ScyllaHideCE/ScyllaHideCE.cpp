@@ -40,10 +40,10 @@ const WCHAR g_scyllaHideDllFilename[] = L"HookLibraryx64.dll";
 const WCHAR g_scyllaHideDllFilename[] = L"HookLibraryx86.dll";
 #endif
 
-void showError(bool getLast = true, std::string errorMsg = "") {
+void showError(std::string errorMsg = "", bool getLast = true) {
     DWORD error;
     std::string lastErrMsg;
-    if (getLast){
+    if (getLast) {
         error = GetLastError();
         lastErrMsg = std::system_category().message(error);
         if (errorMsg[0]) {
@@ -55,7 +55,7 @@ void showError(bool getLast = true, std::string errorMsg = "") {
     }
     else {
         MessageBoxA(0, errorMsg.c_str(), "Error", MB_OK);
-    }    
+    }
 }
 
 
