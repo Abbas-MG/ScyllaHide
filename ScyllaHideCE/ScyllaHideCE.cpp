@@ -368,7 +368,7 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
 
     case EXIT_THREAD_DEBUG_EVENT:
     {
-        if (dbgMode == Attach) {
+        /*if (dbgMode == Attach) {
             ProcessId = DebugEvent->dwProcessId;
             bHooked = false;
             ZeroMemory(&g_hdd, sizeof(HOOK_DLL_DATA));
@@ -391,7 +391,7 @@ int __stdcall debugeventplugin(LPDEBUG_EVENT DebugEvent)
                 }
             }
         }
-        break;
+        break;*/
     }
 
     case LOAD_DLL_DEBUG_EVENT:
