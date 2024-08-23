@@ -58,6 +58,15 @@ void showError(std::string errorMsg = "", bool getLast = true) {
     }
 }
 
+bool isProcAlive(DWORD procID)
+{
+    HANDLE hProcess = OpenProcess(SYNCHRONIZE, FALSE, ProcessId);
+
+    DWORD ret = WaitForSingleObject(hProcess, 0);
+    bool isAlive = ret == WAIT_TIMEOUT;
+    CloseHandle(hProcess);
+    return isAlive;
+}
 
 
 int AdjustGUISize(int baseSize, float scalingFactor) {
