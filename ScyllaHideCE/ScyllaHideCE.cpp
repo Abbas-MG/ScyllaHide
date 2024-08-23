@@ -272,7 +272,7 @@ BOOL __stdcall disassemblercontext(UINT_PTR* selectedAddress)
         return TRUE;
     }
     else {
-        showError("No process is selected", false);
+        showError("No process is open", false);
         return FALSE;
     }
 }
@@ -288,7 +288,7 @@ BOOL __stdcall MemViewPlug_opt(UINT_PTR* disassembleraddress, UINT_PTR* selected
         return TRUE;
     }
     else {
-        showError(false, "No process is selected");
+        showError(false, "No process is open");
         return FALSE;
     }
 }
@@ -310,7 +310,7 @@ BOOL __stdcall MemViewPlug_InjDll(UINT_PTR* disassembleraddress, UINT_PTR* selec
             
     }
     else {
-        showError(false, "No process is selected");
+        showError(false, "No process is open");
         return FALSE;
     }
     
