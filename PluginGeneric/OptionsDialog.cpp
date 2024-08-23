@@ -690,7 +690,7 @@ INT_PTR CALLBACK OptionsDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
                 break;
 
             SaveOptions(hDlg, &g_settings);
-
+#if !defined(_CE)
             if (ProcessId)
             {
 #ifdef __IDP__
@@ -707,7 +707,7 @@ INT_PTR CALLBACK OptionsDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             {
                 MessageBoxW(hDlg, L"Please start the target to apply changes!", L"[ScyllaHide Options]", MB_ICONINFORMATION);
             }
-
+#endif
             EndDialog(hDlg, NULL);
             break;
         }
