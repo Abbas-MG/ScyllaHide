@@ -3,6 +3,8 @@ This is an effort to integrate ScyllaHide, an advanced anti-anti-debugging and a
 
 ScyllaHideCE emerges as particularly beneficial when utilizing the Windows debugger integrated within Cheat Engine.
 
+The plugin and target bitness must match for the plugin to work flawlessly. The Options window will not inject anything (as it does in other instances) to avoid bugs in CE.
+
 Usage Instructions:
 - Incorporate the plugin into Cheat Engine’s settings.
 - Navigate to the “Memory View” window and proceed to the “Plugins” tab.
