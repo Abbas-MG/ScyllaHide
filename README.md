@@ -12,7 +12,7 @@ Usage Instructions:
 - To initiate a process within Cheat Engine, firstly ensure the Windows debugger is selected within the settings.
 - Subsequently, click on the “Open Process” button, choose “File”, and then select “Create Process”.
 
-
+Note: If you are using VEH debugger module, disable KiUserExceptionDispatcher option. 
 
 # ScyllaHide
 
